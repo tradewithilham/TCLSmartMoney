@@ -3,213 +3,268 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Money Scenario Table — The Chartist Lab</title>
+<title>Smart Money Flow Analyzer — The Chartist Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  :root {
-    --bg: #0C0A06;
-    --bg2: #141209;
-    --bg3: #1A1710;
-    --gold: #C9A84C;
-    --gold2: #F0D080;
-    --gold3: #8B6914;
-    --cream: #EDE8DC;
-    --muted: #7A7060;
-    --border: #2A2518;
-    --border2: #3A3220;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    --in-bg: #0D2B14;
-    --in-bd: #1A5C28;
-    --in-tx: #4ADE80;
-    --out-bg: #2B0D0D;
-    --out-bd: #5C1A1A;
-    --out-tx: #F87171;
-    --neu-bg: #1C1A10;
-    --neu-bd: #3A3520;
-    --neu-tx: #A89B6A;
+:root {
+  --bg: #0C0A06;
+  --bg2: #141209;
+  --bg3: #1A1710;
+  --bg4: #201E14;
+  --gold: #C9A84C;
+  --gold2: #F0D080;
+  --gold3: #8B6914;
+  --gold4: #3D2E08;
+  --cream: #EDE8DC;
+  --muted: #7A7060;
+  --border: #2A2518;
+  --border2: #3A3220;
 
-    --bull-bg: #0D2B14; --bull-bd: #1A5C28; --bull-tx: #4ADE80;
-    --mbull-bg: #1A2010; --mbull-bd: #3A5020; --mbull-tx: #86EFAC;
-    --wait-bg: #1C1608; --wait-bd: #4A3808; --wait-tx: #FCD34D;
-    --dist-bg: #200C08; --dist-bd: #5C2010; --dist-tx: #FCA5A5;
-  }
+  --in-bg: #0D2B14; --in-bd: #1A5C28; --in-tx: #4ADE80;
+  --out-bg: #2B0D0D; --out-bd: #5C1A1A; --out-tx: #F87171;
+  --neu-bg: #1C1A10; --neu-bd: #3A3520; --neu-tx: #A89B6A;
 
-  body {
-    background: var(--bg);
-    color: var(--cream);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 40px 24px 60px;
-  }
+  --sbull-bg: #0D2B14; --sbull-bd: #1A5C28; --sbull-tx: #4ADE80;
+  --mbull-bg: #0F2A1A; --mbull-bd: #1F5030; --mbull-tx: #86EFAC;
+  --wait-bg:  #1C1608; --wait-bd:  #4A3808; --wait-tx:  #FCD34D;
+  --dist-bg:  #200C08; --dist-bd:  #5C2010; --dist-tx:  #FCA5A5;
+}
 
-  /* Grain overlay */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 0;
-    opacity: .4;
-  }
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding: 32px 16px 60px;
+}
 
-  .page { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: .5;
+}
 
-  /* Header */
-  .hdr { text-align: center; margin-bottom: 40px; }
-  .hdr-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
-  .hdr-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 54px); font-weight: 900; line-height: 1.1; color: var(--gold2); margin-bottom: 8px; }
-  .hdr-title span { color: var(--cream); }
-  .hdr-sub { font-size: 13px; color: var(--muted); letter-spacing: .5px; }
-  .hdr-line { width: 80px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 18px auto; }
+.page { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; }
 
-  /* Layout */
-  .layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+/* Header */
+.hdr { text-align: center; margin-bottom: 36px; }
+.hdr-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px;
+}
+.hdr-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 48px); font-weight: 900;
+  color: var(--gold2); line-height: 1.1; margin-bottom: 6px;
+}
+.hdr-title span { color: var(--cream); }
+.hdr-sub { font-size: 13px; color: var(--muted); }
+.hdr-line { width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 14px auto; }
 
-  /* Table card */
-  .tcard {
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    overflow: hidden;
-  }
+/* Dropdown Grid */
+.drop-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  margin-bottom: 20px;
+}
 
-  .tcard-hdr {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border2);
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--bg3);
-  }
-  .tcard-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 2px; }
-  .tcard-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+.drop-card {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 16px; position: relative; overflow: hidden;
+  transition: border-color .2s;
+}
+.drop-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--actor-color, var(--gold3)), transparent);
+  opacity: .7;
+}
+.drop-card:focus-within { border-color: var(--actor-color, var(--gold3)); }
 
-  /* Filter pills */
-  .filters { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; background: var(--bg2); }
-  .fp { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--muted); font-size: 10px; font-family: 'IBM Plex Mono', monospace; cursor: pointer; transition: all .15s; letter-spacing: .5px; }
-  .fp:hover { border-color: var(--gold3); color: var(--gold); }
-  .fp.active { background: var(--gold3); border-color: var(--gold); color: var(--gold2); }
+.drop-top {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+}
+.drop-icon { font-size: 18px; }
+.drop-name {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.drop-desc { font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
 
-  /* Table */
-  .tbl-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; }
-  thead { background: var(--bg3); }
-  th {
-    padding: 10px 14px; text-align: center;
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-    color: var(--gold); letter-spacing: 2px; text-transform: uppercase;
-    border-bottom: 1px solid var(--border2); white-space: nowrap;
-  }
-  th:first-child { text-align: left; }
-  th:last-child { text-align: left; }
+.drop-select-wrap { position: relative; }
+.drop-select-wrap::after {
+  content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--gold); font-size: 12px; pointer-events: none;
+}
+select {
+  width: 100%; padding: 10px 32px 10px 14px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--cream);
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: .5px; cursor: pointer; appearance: none;
+  transition: border-color .2s, background .2s;
+}
+select:focus { outline: none; border-color: var(--gold3); background: var(--bg4); }
+select option { background: #1A1710; }
 
-  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; text-align: center; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #1A1810; }
-  td:first-child { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); text-align: left; }
-  td:last-child { text-align: left; }
+/* Selected state badge on card */
+.drop-state {
+  margin-top: 8px; display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px; border: 1px solid;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: .5px;
+  transition: all .2s;
+}
+.state-in  { background: var(--in-bg);  border-color: var(--in-bd);  color: var(--in-tx); }
+.state-out { background: var(--out-bg); border-color: var(--out-bd); color: var(--out-tx); }
+.state-neu { background: var(--neu-bg); border-color: var(--neu-bd); color: var(--neu-tx); }
 
-  /* Badges */
-  .badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 10px; border-radius: 6px; border: 1px solid;
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
-    letter-spacing: .5px; white-space: nowrap;
-  }
-  .badge svg { width: 8px; height: 8px; flex-shrink: 0; }
-  .b-in  { background: var(--in-bg);  border-color: var(--in-bd);  color: var(--in-tx); }
-  .b-out { background: var(--out-bg); border-color: var(--out-bd); color: var(--out-tx); }
-  .b-neu { background: var(--neu-bg); border-color: var(--neu-bd); color: var(--neu-tx); }
+/* Result Panel */
+.result-panel {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 24px; margin-bottom: 20px;
+  transition: border-color .3s;
+  position: relative; overflow: hidden;
+}
+.result-panel::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  transition: background .3s;
+}
+.result-panel.sbull { border-color: var(--sbull-bd); }
+.result-panel.sbull::before { background: linear-gradient(90deg, transparent, #4ADE80, transparent); }
+.result-panel.mbull { border-color: var(--mbull-bd); }
+.result-panel.mbull::before { background: linear-gradient(90deg, transparent, #86EFAC, transparent); }
+.result-panel.wait  { border-color: var(--wait-bd); }
+.result-panel.wait::before  { background: linear-gradient(90deg, transparent, #FCD34D, transparent); }
+.result-panel.dist  { border-color: var(--dist-bd); }
+.result-panel.dist::before  { background: linear-gradient(90deg, transparent, #F87171, transparent); }
 
-  /* Signal pills */
-  .sig {
-    display: inline-block; padding: 5px 12px; border-radius: 6px; border: 1px solid;
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
-    letter-spacing: .5px; white-space: nowrap;
-  }
-  .sig-sbull { background: var(--bull-bg);  border-color: var(--bull-bd);  color: var(--bull-tx); }
-  .sig-mbull { background: var(--mbull-bg); border-color: var(--mbull-bd); color: var(--mbull-tx); }
-  .sig-wait  { background: var(--wait-bg);  border-color: var(--wait-bd);  color: var(--wait-tx); }
-  .sig-dist  { background: var(--dist-bg);  border-color: var(--dist-bd);  color: var(--dist-tx); }
+.result-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.result-left {}
+.result-lbl {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+}
+.result-signal {
+  font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px);
+  font-weight: 900; line-height: 1; transition: color .3s;
+}
+.result-badge {
+  display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 20px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
+  letter-spacing: .5px; border: 1px solid; transition: all .3s;
+}
+.result-score-wrap { text-align: center; }
+.score-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
+.score-bar-wrap { width: 80px; height: 80px; position: relative; }
+.score-bar-wrap svg { transform: rotate(-90deg); }
+.score-num {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600;
+  transition: color .3s;
+}
 
-  .note-cell { font-size: 11px; color: var(--muted); line-height: 1.5; min-width: 180px; max-width: 260px; }
-  .note-cell strong { color: var(--cream); font-weight: 500; }
+.result-desc {
+  font-size: 13px; color: var(--muted); line-height: 1.7;
+  padding-top: 14px; border-top: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.result-desc strong { color: var(--cream); font-weight: 500; }
 
-  /* Divider rows */
-  .div-row td {
-    padding: 6px 14px;
-    background: var(--bg3);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px; color: var(--gold3); letter-spacing: 2px;
-    text-transform: uppercase; text-align: left;
-    border-bottom: 1px solid var(--border2);
-    border-top: 1px solid var(--border2);
-  }
-  .div-row:hover td { background: var(--bg3); }
+/* Breakdown */
+.breakdown {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.bk { text-align: center; }
+.bk-name { font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
+.bk-val {
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;
+  transition: color .2s;
+}
 
-  /* Sidebar */
-  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+/* Action Cards */
+.action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+.ac {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 14px 16px;
+}
+.ac-icon { font-size: 16px; margin-bottom: 6px; }
+.ac-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;
+}
+.ac-text { font-size: 11px; color: var(--muted); line-height: 1.6; }
+.ac-text strong { color: var(--cream); font-weight: 500; }
 
-  .scard {
-    background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px;
-    padding: 18px 20px; position: relative; overflow: hidden;
-  }
-  .scard::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
-  .scard-ttl {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--gold);
-    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .scard-icon { font-size: 14px; }
+/* Reference Table Toggle */
+.ref-toggle {
+  width: 100%; padding: 12px 20px;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 12px; color: var(--gold);
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+  cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center;
+  transition: background .15s; margin-bottom: 10px;
+}
+.ref-toggle:hover { background: var(--bg3); }
+.ref-toggle span { transition: transform .2s; }
+.ref-toggle.open span { transform: rotate(180deg); }
 
-  .role-item { margin-bottom: 12px; }
-  .role-item:last-child { margin-bottom: 0; }
-  .role-name { font-size: 12px; font-weight: 500; color: var(--cream); margin-bottom: 2px; }
-  .role-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.ref-table-wrap {
+  display: none; background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+}
+.ref-table-wrap.open { display: block; }
 
-  .logic-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
-  .logic-item:last-child { margin-bottom: 0; }
-  .logic-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); margin-top: 5px; flex-shrink: 0; }
-  .logic-text { font-size: 11px; color: var(--muted); line-height: 1.5; }
-  .logic-text strong { color: var(--cream); font-weight: 500; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  padding: 8px 12px; text-align: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+  color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--bg3); border-bottom: 1px solid var(--border2);
+}
+th:first-child, th:last-child { text-align: left; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; text-align: center; font-size: 11px; }
+tr:last-child td { border-bottom: none; }
+tr.cur-row td { background: #1A1E12; }
+tr:hover td { background: #1A1810; }
+td:last-child { text-align: left; color: var(--muted); font-size: 10px; max-width: 200px; }
 
-  .weight-table { width: 100%; }
-  .weight-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
-  .weight-row:last-child { border-bottom: none; }
-  .w-actor { font-size: 11px; color: var(--cream); font-weight: 500; }
-  .w-vals { display: flex; gap: 6px; }
-  .wv { font-family: 'IBM Plex Mono', monospace; font-size: 9px; padding: 2px 6px; border-radius: 4px; }
-  .wv-in  { background: var(--in-bg);  color: var(--in-tx); }
-  .wv-neu { background: var(--neu-bg); color: var(--neu-tx); }
-  .wv-out { background: var(--out-bg); color: var(--out-tx); }
+.pill { display: inline-block; padding: 3px 8px; border-radius: 5px; border: 1px solid; font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 600; letter-spacing: .3px; white-space: nowrap; }
+.p-sb { background: var(--sbull-bg); border-color: var(--sbull-bd); color: var(--sbull-tx); }
+.p-mb { background: var(--mbull-bg); border-color: var(--mbull-bd); color: var(--mbull-tx); }
+.p-wt { background: var(--wait-bg);  border-color: var(--wait-bd);  color: var(--wait-tx); }
+.p-dt { background: var(--dist-bg);  border-color: var(--dist-bd);  color: var(--dist-tx); }
 
-  .quote-box { margin-top: 4px; padding: 14px 16px; border-left: 2px solid var(--gold3); background: var(--bg3); border-radius: 0 8px 8px 0; }
-  .quote-text { font-family: 'Playfair Display', serif; font-size: 13px; color: var(--gold2); font-style: italic; line-height: 1.6; margin-bottom: 6px; }
-  .quote-attr { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); }
+.ti { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; }
+.ti-in  { color: var(--in-tx); }
+.ti-out { color: var(--out-tx); }
+.ti-neu { color: var(--neu-tx); }
 
-  /* Legend bar */
-  .legend {
-    margin-top: 20px; padding: 12px 20px;
-    background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px;
-    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-  }
-  .legend-ttl { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1.5px; }
-  .legend-items { display: flex; gap: 12px; flex-wrap: wrap; }
-  .li { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+/* Footer / Branding */
+.brand-footer {
+  text-align: center; padding: 24px 20px;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 16px;
+}
+.brand-name {
+  font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+  color: var(--gold2); margin-bottom: 4px;
+}
+.brand-handle {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: var(--muted); letter-spacing: 1px; margin-bottom: 12px;
+}
+.brand-quote {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 13px; color: var(--gold); margin-bottom: 6px;
+}
 
-  /* Footer */
-  .footer { text-align: center; margin-top: 32px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-
-  @media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; }
-    .sidebar { display: grid; grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 560px) {
-    .sidebar { grid-template-columns: 1fr; }
-    body { padding: 20px 12px 40px; }
-  }
+@media (max-width: 560px) {
+  .drop-grid { grid-template-columns: 1fr; }
+  .action-grid { grid-template-columns: 1fr; }
+  .breakdown { grid-template-columns: repeat(2, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -218,240 +273,380 @@
   <!-- Header -->
   <div class="hdr">
     <div class="hdr-eyebrow">The Chartist Lab · Smart Money Framework</div>
-    <div class="hdr-title"><span>Skenario</span> Smart Money</div>
+    <div class="hdr-title">Smart Money <span>Flow Analyzer</span></div>
     <div class="hdr-line"></div>
-    <div class="hdr-sub">Panduan membaca arah pasar berdasarkan aliran 4 aktor utama</div>
+    <div class="hdr-sub">Pilih kondisi setiap aktor — signal & interpretasi keluar otomatis</div>
   </div>
 
-  <div class="layout">
-
-    <!-- Main Table -->
-    <div>
-      <div class="tcard">
-        <div class="tcard-hdr">
-          <span class="tcard-title">Matriks Skenario</span>
-          <span class="tcard-count" id="count-label">18 skenario</span>
-        </div>
-        <div class="filters">
-          <button class="fp active" onclick="filter('all',this)">Semua</button>
-          <button class="fp" onclick="filter('sbull',this)">Strong Bull</button>
-          <button class="fp" onclick="filter('mbull',this)">Moderate Bull</button>
-          <button class="fp" onclick="filter('wait',this)">Wait &amp; See</button>
-          <button class="fp" onclick="filter('dist',this)">Strong Distribusi</button>
-        </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Foreign</th>
-                <th>Retail</th>
-                <th>Institusi</th>
-                <th>Zombie</th>
-                <th>Signal</th>
-                <th>Catatan Singkat</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
+  <!-- Dropdown Grid -->
+  <div class="drop-grid">
+    <div class="drop-card" style="--actor-color:#4ADE80">
+      <div class="drop-top">
+        <span class="drop-icon">🌏</span>
+        <span class="drop-name" style="color:#4ADE80">Foreign</span>
       </div>
-
-      <!-- Legend -->
-      <div class="legend">
-        <span class="legend-ttl">LEGEND</span>
-        <div class="legend-items">
-          <span class="li"><span class="badge b-in"><svg viewBox="0 0 8 8"><polygon points="4,1 7,7 1,7" fill="currentColor"/></svg>IN</span> Masuk / Akumulasi</span>
-          <span class="li"><span class="badge b-out"><svg viewBox="0 0 8 8"><polygon points="4,7 7,1 1,1" fill="currentColor"/></svg>OUT</span> Keluar / Distribusi</span>
-          <span class="li"><span class="badge b-neu">— NEU</span> Netral / Tidak Signifikan</span>
-        </div>
+      <div class="drop-desc">Dana asing — global risk-on/off, penggerak trend utama</div>
+      <div class="drop-select-wrap">
+        <select id="sel-foreign" onchange="update()">
+          <option value="in">▲ IN — Masuk / Akumulasi</option>
+          <option value="neu">— NEU — Netral</option>
+          <option value="out">▼ OUT — Keluar / Distribusi</option>
+        </select>
       </div>
+      <div class="drop-state state-in" id="state-foreign">▲ MASUK</div>
+    </div>
 
-      <div class="footer" style="margin-top:16px">
-        Base Score = 50 · Foreign ±30/+5/−20 · Retail −10/+5/+15 · Institusi ±25/+3/−15 · Zombie ±25/+2/−10
+    <div class="drop-card" style="--actor-color:#F87171">
+      <div class="drop-top">
+        <span class="drop-icon">👤</span>
+        <span class="drop-name" style="color:#F87171">Retail</span>
+      </div>
+      <div class="drop-desc">Publik — FOMO driven, sinyal contrarian terkuat</div>
+      <div class="drop-select-wrap">
+        <select id="sel-retail" onchange="update()">
+          <option value="in">▲ IN — Masuk / Akumulasi</option>
+          <option value="neu" selected>— NEU — Netral</option>
+          <option value="out">▼ OUT — Keluar / Distribusi</option>
+        </select>
+      </div>
+      <div class="drop-state state-neu" id="state-retail">— NETRAL</div>
+    </div>
+
+    <div class="drop-card" style="--actor-color:#A78BFA">
+      <div class="drop-top">
+        <span class="drop-icon">🏦</span>
+        <span class="drop-name" style="color:#A78BFA">Institusi</span>
+      </div>
+      <div class="drop-desc">Dana institusi lokal — riset mendalam, akumulasi sistematis</div>
+      <div class="drop-select-wrap">
+        <select id="sel-institusi" onchange="update()">
+          <option value="in" selected>▲ IN — Masuk / Akumulasi</option>
+          <option value="neu">— NEU — Netral</option>
+          <option value="out">▼ OUT — Keluar / Distribusi</option>
+        </select>
+      </div>
+      <div class="drop-state state-in" id="state-institusi">▲ MASUK</div>
+    </div>
+
+    <div class="drop-card" style="--actor-color:#FCD34D">
+      <div class="drop-top">
+        <span class="drop-icon">👻</span>
+        <span class="drop-name" style="color:#FCD34D">Zombie</span>
+      </div>
+      <div class="drop-desc">Bandar lokal diam-diam — "intel jalanan" paling dini</div>
+      <div class="drop-select-wrap">
+        <select id="sel-zombie" onchange="update()">
+          <option value="in" selected>▲ IN — Masuk / Akumulasi</option>
+          <option value="neu">— NEU — Netral</option>
+          <option value="out">▼ OUT — Keluar / Distribusi</option>
+        </select>
+      </div>
+      <div class="drop-state state-in" id="state-zombie">▲ MASUK</div>
+    </div>
+  </div>
+
+  <!-- Result Panel -->
+  <div class="result-panel sbull" id="result-panel">
+    <div class="result-top">
+      <div class="result-left">
+        <div class="result-lbl">Market Signal</div>
+        <div class="result-signal" id="res-signal" style="color:#4ADE80">STRONG BULL</div>
+        <div class="result-badge" id="res-badge" style="background:var(--sbull-bg);border-color:var(--sbull-bd);color:var(--sbull-tx)">TIER 1 · TRIPLE KONFIRMASI</div>
+      </div>
+      <div class="result-score-wrap">
+        <div class="score-label">SKOR</div>
+        <div class="score-bar-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#2A2518" stroke-width="6"/>
+            <circle id="score-arc" cx="40" cy="40" r="32" fill="none" stroke="#4ADE80" stroke-width="6"
+              stroke-dasharray="201" stroke-dashoffset="41" stroke-linecap="round" style="transition:all .4s"/>
+          </svg>
+          <div class="score-num" id="score-num" style="color:#4ADE80">80</div>
+        </div>
       </div>
     </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-
-      <div class="scard">
-        <div class="scard-ttl"><span class="scard-icon">🏛</span> Peran Pelaku</div>
-        <div class="role-item">
-          <div class="role-name">Foreign (Asing)</div>
-          <div class="role-desc">Smart money global. Risk-on/off indicator terkuat. Penggerak trend utama.</div>
-        </div>
-        <div class="role-item">
-          <div class="role-name">Institusi (Lokal)</div>
-          <div class="role-desc">Riset mendalam, akumulasi sistematis. Konfirmasi fundamental kuat.</div>
-        </div>
-        <div class="role-item">
-          <div class="role-name">Zombie (Bandar)</div>
-          <div class="role-desc">Bandar lokal diam-diam. "Intel jalanan" — tahu sesuatu sebelum market.</div>
-        </div>
-        <div class="role-item">
-          <div class="role-name">Retail (Publik)</div>
-          <div class="role-desc">Contrarian signal. Retail masuk = late FOMO. Retail keluar = supply diserap.</div>
-        </div>
-      </div>
-
-      <div class="scard">
-        <div class="scard-ttl"><span class="scard-icon">⚖️</span> Bobot Scoring</div>
-        <div class="weight-table">
-          <div class="weight-row">
-            <span class="w-actor">Foreign</span>
-            <div class="w-vals">
-              <span class="wv wv-in">+30</span>
-              <span class="wv wv-neu">+5</span>
-              <span class="wv wv-out">−20</span>
-            </div>
-          </div>
-          <div class="weight-row">
-            <span class="w-actor">Institusi</span>
-            <div class="w-vals">
-              <span class="wv wv-in">+25</span>
-              <span class="wv wv-neu">+3</span>
-              <span class="wv wv-out">−15</span>
-            </div>
-          </div>
-          <div class="weight-row">
-            <span class="w-actor">Zombie</span>
-            <div class="w-vals">
-              <span class="wv wv-in">+25</span>
-              <span class="wv wv-neu">+2</span>
-              <span class="wv wv-out">−10</span>
-            </div>
-          </div>
-          <div class="weight-row">
-            <span class="w-actor">Retail</span>
-            <div class="w-vals">
-              <span class="wv wv-in">−10</span>
-              <span class="wv wv-neu">+5</span>
-              <span class="wv wv-out">+15</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="scard">
-        <div class="scard-ttl"><span class="scard-icon">🧠</span> Logika Membaca</div>
-        <div class="logic-item"><div class="logic-dot"></div><div class="logic-text"><strong>Akumulasi terjadi</strong> saat Smart Money (Foreign + Institusi + Zombie) masuk ketika Retail keluar.</div></div>
-        <div class="logic-item"><div class="logic-dot"></div><div class="logic-text"><strong>Distribusi terjadi</strong> saat Smart Money keluar sementara Retail masih masuk (jebakan).</div></div>
-        <div class="logic-item"><div class="logic-dot"></div><div class="logic-text"><strong>Konfirmasi terkuat:</strong> Foreign + Institusi + Zombie searah bersamaan.</div></div>
-        <div class="logic-item"><div class="logic-dot"></div><div class="logic-text"><strong>Zombie reversal</strong> adalah sinyal distribusi awal paling dini sebelum aktor lain bergerak.</div></div>
-      </div>
-
-      <div class="scard">
-        <div class="quote-box">
-          <div class="quote-text">"Follow the Smart Money, not the Crowd."</div>
-          <div class="quote-attr">@iamthechartist</div>
-        </div>
-      </div>
-
+    <div class="result-desc" id="res-desc">
+      Foreign masuk + Institusi masuk + Zombie akumulasi = <strong>triple confirmation</strong>. Retail netral = smart money absorbing supply. Setup terkuat — probabilitas bullish sangat tinggi.
     </div>
+
+    <div class="breakdown">
+      <div class="bk"><div class="bk-name">FOREIGN</div><div class="bk-val" id="bk-f" style="color:#4ADE80">+30</div></div>
+      <div class="bk"><div class="bk-name">RETAIL</div><div class="bk-val" id="bk-r" style="color:#A89B6A">+5</div></div>
+      <div class="bk"><div class="bk-name">INSTITUSI</div><div class="bk-val" id="bk-i" style="color:#4ADE80">+25</div></div>
+      <div class="bk"><div class="bk-name">ZOMBIE</div><div class="bk-val" id="bk-z" style="color:#4ADE80">+25</div></div>
+    </div>
+  </div>
+
+  <!-- Action Cards -->
+  <div class="action-grid" id="action-grid">
+    <div class="ac">
+      <div class="ac-icon">📈</div>
+      <div class="ac-title">Entry Strategy</div>
+      <div class="ac-text" id="ac-entry">BUY on dip. Triple confirmation aktif. Scale up bertahap — jangan all-in sekaligus. Prioritaskan saham dengan volume asing naik.</div>
+    </div>
+    <div class="ac">
+      <div class="ac-icon">🛡️</div>
+      <div class="ac-title">Risk Management</div>
+      <div class="ac-text" id="ac-risk">Stop loss di support kuat. Jika foreign tiba-tiba reversal, reduce posisi 50% cepat. Trailing stop setelah +10%.</div>
+    </div>
+    <div class="ac">
+      <div class="ac-icon">👁️</div>
+      <div class="ac-title">Yang Perlu Dipantau</div>
+      <div class="ac-text" id="ac-monitor">Pantau arus foreign harian paling ketat. Watch if zombie mulai reversal — sinyal distribusi awal paling dini.</div>
+    </div>
+    <div class="ac">
+      <div class="ac-icon">⏳</div>
+      <div class="ac-title">Time Horizon</div>
+      <div class="ac-text" id="ac-time">Swing–mid term. Hold selama foreign + institusi masih positif. Review kondisi setiap minggu.</div>
+    </div>
+  </div>
+
+  <!-- Reference Table -->
+  <button class="ref-toggle" id="ref-toggle" onclick="toggleRef()">
+    <span>📋 &nbsp;Lihat Semua Skenario Referensi</span>
+    <span id="toggle-arrow">▾</span>
+  </button>
+  <div class="ref-table-wrap" id="ref-table">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Foreign</th><th>Retail</th><th>Institusi</th><th>Zombie</th><th>Signal</th><th>Catatan</th>
+        </tr>
+      </thead>
+      <tbody id="ref-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Brand Footer -->
+  <div class="brand-footer">
+    <div class="brand-name">The Chartist Lab</div>
+    <div class="brand-handle">@iamthechartist</div>
+    <div class="brand-quote">"Follow the Smart Money, not the Crowd."</div>
   </div>
 
 </div>
 
 <script>
-const IN  = '<span class="badge b-in"><svg viewBox="0 0 8 8" width="8" height="8"><polygon points="4,1 7,7 1,7" fill="currentColor"/></svg>IN</span>';
-const OUT = '<span class="badge b-out"><svg viewBox="0 0 8 8" width="8" height="8"><polygon points="4,7 7,1 1,1" fill="currentColor"/></svg>OUT</span>';
-const NEU = '<span class="badge b-neu">— NEU</span>';
-
-const SIG = {
-  sbull: '<span class="sig sig-sbull">STRONG BULL</span>',
-  mbull: '<span class="sig sig-mbull">MODERATE BULL</span>',
-  wait:  '<span class="sig sig-wait">WAIT &amp; SEE</span>',
-  dist:  '<span class="sig sig-dist">STRONG DISTRIBUSI</span>',
+const W = {
+  foreign:  { in: +30, neu: +5,  out: -20 },
+  retail:   { in: -10, neu: +5,  out: +15 },
+  institusi:{ in: +25, neu: +3,  out: -15 },
+  zombie:   { in: +25, neu: +2,  out: -10 },
 };
 
-// All scenarios — corrected & complete, ranked by score desc, grouped by signal
-const scenarios = [
-  // ─── STRONG BULL ≥75 ───
-  { id:1,  f:'in',  r:'out', i:'in',  z:'in',  tp:'sbull', note:'<strong>Setup terkuat.</strong> Triple smart money masuk + retail supply diserap. Probabilitas bullish paling tinggi.' },
-  { id:2,  f:'in',  r:'neu', i:'in',  z:'in',  tp:'sbull', note:'<strong>Early phase uptrend.</strong> Triple masuk, retail belum bergerak — window akumulasi terbaik.' },
-  // ─── MODERATE BULL 50–74 ───
-  { id:3,  f:'in',  r:'in',  i:'in',  z:'in',  tp:'mbull', note:'<strong>Late confirmation.</strong> Semua masuk — harga kemungkinan sudah naik. Hati-hati beli di atas.' },
-  { id:4,  f:'in',  r:'out', i:'in',  z:'neu', tp:'mbull', note:'<strong>Foreign + Institusi kompak.</strong> Zombie netral — masih akumulasi tapi belum agresif.' },
-  { id:5,  f:'in',  r:'out', i:'in',  z:'out', tp:'mbull', note:'<strong>Foreign + Institusi masuk.</strong> Zombie sudah keluar duluan — waspadai distribusi parsial zombie.' },
-  { id:6,  f:'in',  r:'out', i:'out', z:'in',  tp:'mbull', note:'<strong>Foreign + Zombie masuk.</strong> Institusi belum konfirmasi — tunggu institusi masuk sebelum sizing besar.' },
-  { id:7,  f:'in',  r:'neu', i:'in',  z:'neu', tp:'mbull', note:'<strong>Foreign + Institusi.</strong> Zombie & retail netral — akumulasi berlangsung tapi perlahan.' },
-  { id:8,  f:'in',  r:'neu', i:'neu', z:'in',  tp:'mbull', note:'<strong>Foreign + Zombie.</strong> Institusi belum bergerak — sinyal awal, konfirmasi institusi dibutuhkan.' },
-  { id:9,  f:'neu', r:'out', i:'in',  z:'in',  tp:'mbull', note:'<strong>Lokal dominan.</strong> Institusi + zombie akumulasi tanpa foreign. Cukup kuat tapi rentan jika foreign reversal.' },
-  { id:10, f:'out', r:'out', i:'in',  z:'in',  tp:'mbull', note:'<strong>Lokal vs Asing konflik.</strong> Smart money lokal masuk tapi foreign keluar — sizing kecil, pantau ketat.' },
-  // ─── WAIT & SEE 25–49 ───
-  { id:11, f:'in',  r:'in',  i:'out', z:'out', tp:'wait',  note:'<strong>Foreign masuk sendiri.</strong> Institusi + zombie keluar, retail FOMO — sinyal tidak konsisten.' },
-  { id:12, f:'neu', r:'in',  i:'in',  z:'in',  tp:'wait',  note:'<strong>Retail FOMO bareng smart money.</strong> Foreign netral — volatile. Potensi bull tapi late entry risk.' },
-  { id:13, f:'neu', r:'neu', i:'in',  z:'in',  tp:'wait',  note:'<strong>Institusi + zombie diam-diam.</strong> Foreign & retail netral — akumulasi senyap, butuh katalis.' },
-  { id:14, f:'out', r:'in',  i:'in',  z:'neu', tp:'wait',  note:'<strong>Foreign keluar, lokal masih masuk.</strong> Konflik arah — risiko tinggi. Tunggu foreign stabilisasi.' },
-  { id:15, f:'out', r:'neu', i:'in',  z:'in',  tp:'wait',  note:'<strong>Smart money lokal bertahan.</strong> Foreign risk-off — apakah lokal lebih tahu atau salah arah?' },
-  // ─── STRONG DISTRIBUSI <25 ───
-  { id:16, f:'out', r:'in',  i:'out', z:'out', tp:'dist',  note:'<strong>Jebakan bandar klasik.</strong> Retail FOMO masuk saat semua smart money keluar. Distribusi aktif.' },
-  { id:17, f:'out', r:'in',  i:'in',  z:'out', tp:'dist',  note:'<strong>Zombie sudah kabur.</strong> Institusi masih masuk tapi zombie keluar duluan — sinyal distribusi awal.' },
-  { id:18, f:'out', r:'neu', i:'out', z:'out', tp:'dist',  note:'<strong>Market sepi + tekanan jual.</strong> Hanya foreign yang aktif keluar. Hindari semua posisi baru.' },
-  { id:19, f:'out', r:'out', i:'out', z:'neu', tp:'dist',  note:'<strong>Zombie netral di tengah eksodus.</strong> Semua keluar kecuali zombie ragu — potensi dead cat bounce tipis.' },
-  { id:20, f:'out', r:'out', i:'out', z:'in',  tp:'dist',  note:'<strong>Hanya zombie bertahan.</strong> Bisa deep value atau value trap — tidak cukup konfirmasi tanpa aktor lain.' },
-  { id:21, f:'out', r:'out', i:'out', z:'out', tp:'dist',  note:'<strong>Exodus total.</strong> Semua aktor keluar. Cash is king. Tidak ada justifikasi posisi apapun.' },
+const SCENARIOS = [
+  { f:'in',  r:'out', i:'in',  z:'in',  tp:'sbull', note:'Triple smart money masuk, retail supply diserap. Setup terkuat.' },
+  { f:'in',  r:'neu', i:'in',  z:'in',  tp:'sbull', note:'Triple masuk, retail belum bergerak. Early phase uptrend terbaik.' },
+  { f:'in',  r:'in',  i:'in',  z:'in',  tp:'mbull', note:'Semua masuk — late confirmation, harga kemungkinan sudah naik.' },
+  { f:'in',  r:'out', i:'in',  z:'neu', tp:'mbull', note:'Foreign + institusi kompak, zombie netral — akumulasi belum agresif.' },
+  { f:'in',  r:'out', i:'in',  z:'out', tp:'mbull', note:'Foreign + institusi masuk, zombie sudah keluar duluan.' },
+  { f:'in',  r:'out', i:'out', z:'in',  tp:'mbull', note:'Foreign + zombie masuk, institusi belum konfirmasi.' },
+  { f:'in',  r:'neu', i:'in',  z:'neu', tp:'mbull', note:'Foreign + institusi, zombie & retail netral. Akumulasi perlahan.' },
+  { f:'in',  r:'neu', i:'neu', z:'in',  tp:'mbull', note:'Foreign + zombie, institusi belum bergerak. Sinyal awal.' },
+  { f:'neu', r:'out', i:'in',  z:'in',  tp:'mbull', note:'Lokal dominan. Institusi + zombie tanpa foreign. Rentan jika foreign reversal.' },
+  { f:'out', r:'out', i:'in',  z:'in',  tp:'mbull', note:'Smart money lokal masuk, foreign keluar. Konflik — sizing kecil.' },
+  { f:'in',  r:'in',  i:'out', z:'out', tp:'wait',  note:'Foreign masuk sendiri. Institusi + zombie keluar, retail FOMO.' },
+  { f:'neu', r:'in',  i:'in',  z:'in',  tp:'wait',  note:'Retail FOMO bareng smart money. Volatile, late entry risk.' },
+  { f:'neu', r:'neu', i:'in',  z:'in',  tp:'wait',  note:'Institusi + zombie diam-diam. Foreign & retail netral, butuh katalis.' },
+  { f:'out', r:'in',  i:'in',  z:'neu', tp:'wait',  note:'Foreign keluar, lokal masih masuk. Konflik arah, risiko tinggi.' },
+  { f:'out', r:'neu', i:'in',  z:'in',  tp:'wait',  note:'Smart money lokal bertahan saat foreign risk-off.' },
+  { f:'out', r:'in',  i:'out', z:'out', tp:'dist',  note:'Jebakan bandar klasik. Retail FOMO, semua smart money keluar.' },
+  { f:'out', r:'in',  i:'in',  z:'out', tp:'dist',  note:'Zombie sudah kabur duluan. Distribusi awal terdeteksi.' },
+  { f:'out', r:'neu', i:'out', z:'out', tp:'dist',  note:'Market sepi + tekanan jual. Hindari semua posisi baru.' },
+  { f:'out', r:'out', i:'out', z:'neu', tp:'dist',  note:'Semua keluar kecuali zombie ragu. Potensi dead cat bounce tipis.' },
+  { f:'out', r:'out', i:'out', z:'in',  tp:'dist',  note:'Hanya zombie bertahan. Tidak cukup konfirmasi tanpa aktor lain.' },
+  { f:'out', r:'out', i:'out', z:'out', tp:'dist',  note:'Exodus total. Cash is king. Tidak ada justifikasi posisi apapun.' },
 ];
 
-const mapI = {in:IN, out:OUT, neu:NEU};
-
-const GROUP_LABELS = {
-  sbull: '▲ STRONG BULL — Skor ≥ 75',
-  mbull: '◆ MODERATE BULL — Skor 50–74',
-  wait:  '◌ WAIT & SEE — Skor 25–49',
-  dist:  '▼ STRONG DISTRIBUSI — Skor < 25',
+const SIG_MAP = {
+  sbull: { label:'STRONG BULL',       badge:'TIER 1 · TRIPLE KONFIRMASI',  color:'#4ADE80', cls:'sbull' },
+  mbull: { label:'MODERATE BULL',     badge:'TIER 2 · AKUMULASI PARSIAL',  color:'#86EFAC', cls:'mbull' },
+  wait:  { label:'WAIT & SEE',        badge:'TIER 3 · KONFLIK SINYAL',     color:'#FCD34D', cls:'wait'  },
+  dist:  { label:'STRONG DISTRIBUSI', badge:'TIER 4 · SMART MONEY OUT',    color:'#F87171', cls:'dist'  },
 };
 
-let currentFilter = 'all';
+const BK_W = {
+  foreign:  { in:'+30', neu:'+5',  out:'−20' },
+  retail:   { in:'−10', neu:'+5',  out:'+15' },
+  institusi:{ in:'+25', neu:'+3',  out:'−15' },
+  zombie:   { in:'+25', neu:'+2',  out:'−10' },
+};
+const BK_C = {
+  foreign:  { in:'#4ADE80', neu:'#A89B6A', out:'#F87171' },
+  retail:   { in:'#F87171', neu:'#A89B6A', out:'#4ADE80' },
+  institusi:{ in:'#86EFAC', neu:'#A89B6A', out:'#F87171' },
+  zombie:   { in:'#FCD34D', neu:'#A89B6A', out:'#F87171' },
+};
 
-function filter(type, btn) {
-  currentFilter = type;
-  document.querySelectorAll('.fp').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
+const STATE_LBL = { in:'▲ MASUK', neu:'— NETRAL', out:'▼ KELUAR' };
+const STATE_CLS = { in:'state-in', neu:'state-neu', out:'state-out' };
+
+function getDesc(sc, s) {
+  const parts = [];
+  if (s.foreign==='in')   parts.push('Foreign risk-on masuk');
+  if (s.foreign==='out')  parts.push('Foreign risk-off keluar');
+  if (s.retail==='out')   parts.push('retail supply diserap smart money');
+  if (s.retail==='in')    parts.push('retail FOMO masuk (late signal)');
+  if (s.institusi==='in') parts.push('institusi akumulasi sistematis');
+  if (s.institusi==='out')parts.push('institusi distribusi');
+  if (s.zombie==='in')    parts.push('zombie bandar akumulasi senyap');
+  if (s.zombie==='out')   parts.push('zombie sudah keluar duluan');
+
+  const tier = getSigType(sc);
+  const T = {
+    sbull: `<strong>${parts.slice(0,2).join(' + ')}</strong>${parts.length>2?' + '+parts.slice(2).join(', '):''} — setup sangat kuat, probabilitas bullish continuation tinggi.`,
+    mbull: `${parts.join(' + ')} — setup cukup kuat tapi perlu konfirmasi tambahan sebelum sizing besar.`,
+    wait:  `Sinyal konflik: <strong>${parts.join(', ')}</strong>. Butuh konfirmasi lebih. Sizing kecil atau cash dulu.`,
+    dist:  `<strong>Waspada distribusi:</strong> ${parts.join(', ')}. Smart money keluar — hindari posisi baru.`,
+  };
+  return T[tier];
 }
 
-function render() {
-  const tbody = document.getElementById('tbody');
-  const filtered = currentFilter === 'all' ? scenarios : scenarios.filter(s => s.tp === currentFilter);
-  
-  document.getElementById('count-label').textContent = filtered.length + ' skenario';
-
-  const groups = ['sbull','mbull','wait','dist'];
-  let html = '';
-  let num = 1;
-
-  if (currentFilter === 'all') {
-    groups.forEach(g => {
-      const items = filtered.filter(s => s.tp === g);
-      if (!items.length) return;
-      html += `<tr class="div-row"><td colspan="7">${GROUP_LABELS[g]}</td></tr>`;
-      items.forEach(s => {
-        html += row(s, num++);
-      });
-    });
-  } else {
-    filtered.forEach(s => { html += row(s, num++); });
-  }
-
-  tbody.innerHTML = html;
+function getRec(sc, s) {
+  const tier = getSigType(sc);
+  const R = {
+    sbull: {
+      entry: sc>=80 ? 'BUY on dip. Triple confirmation aktif. Scale up bertahap — jangan all-in. Prioritaskan saham dengan volume asing naik.' : 'Mulai akumulasi, sizing moderat. Tunggu satu konfirmasi tambahan sebelum full position.',
+      risk:  'Stop loss di support kuat. Jika foreign tiba-tiba reversal, reduce 50% cepat. Trailing stop setelah +10%.',
+      monitor: 'Pantau arus foreign harian paling ketat. Watch if zombie mulai reversal — sinyal distribusi awal.',
+      time:  'Swing–mid term. Hold selama foreign + institusi masih positif. Review mingguan.',
+    },
+    mbull: {
+      entry: 'Akumulasi bertahap, sizing 40–60% dari target. Jangan all-in — masih ada risiko sinyal berbalik.',
+      risk:  'Stop loss lebih ketat dari biasanya. Max risk 1.5% per trade. Siap reduce jika satu aktor berbalik.',
+      monitor: 'Pantau apakah aktor yang belum masuk segera konfirmasi. Jika tidak, downgrade ke Wait.',
+      time:  'Short–swing term. Tidak ada hold panjang sampai konfirmasi lebih kuat.',
+    },
+    wait: {
+      entry: 'WAIT. Sinyal masih konflik. Masuk hanya di level support teknikal yang sangat kuat. Jangan chase.',
+      risk:  'Max risk 1% per trade. Volatilitas tinggi saat sinyal tidak konsisten. Cash lebih aman.',
+      monitor: 'Monitor siapa yang paling dominan berubah. Jika institusi ikut masuk → upgrade ke Moderate Bull.',
+      time:  'Tidak ada time horizon — tunggu sampai sinyal lebih jelas. Sabar adalah strategi.',
+    },
+    dist: {
+      entry: 'HINDARI posisi baru. Tidak ada justifikasi entry saat smart money keluar.',
+      risk:  'Jika masih hold posisi lama, pasang stop ketat atau CUT LOSS. Jangan average down.',
+      monitor: 'Monitor kapan foreign mulai stabilisasi — itu sinyal pertama potensi reversal.',
+      time:  'Tidak ada target hold — tunggu sampai sinyal berubah minimal ke Wait & See.',
+    },
+  };
+  return R[tier];
 }
 
-function row(s, n) {
-  return `<tr>
-    <td>${String(n).padStart(2,'0')}</td>
-    <td>${mapI[s.f]}</td>
-    <td>${mapI[s.r]}</td>
-    <td>${mapI[s.i]}</td>
-    <td>${mapI[s.z]}</td>
-    <td>${SIG[s.tp]}</td>
-    <td class="note-cell">${s.note}</td>
-  </tr>`;
+function getSigType(sc) {
+  if (sc >= 75) return 'sbull';
+  if (sc >= 50) return 'mbull';
+  if (sc >= 25) return 'wait';
+  return 'dist';
 }
 
-window.filter = filter;
-render();
+function calcScore(s) {
+  return Math.max(0, Math.min(100,
+    50 + W.foreign[s.foreign] + W.retail[s.retail] + W.institusi[s.institusi] + W.zombie[s.zombie]
+  ));
+}
+
+function update() {
+  const s = {
+    foreign:   document.getElementById('sel-foreign').value,
+    retail:    document.getElementById('sel-retail').value,
+    institusi: document.getElementById('sel-institusi').value,
+    zombie:    document.getElementById('sel-zombie').value,
+  };
+
+  // Update state badges on cards
+  ['foreign','retail','institusi','zombie'].forEach(k => {
+    const el = document.getElementById('state-' + k);
+    el.textContent = STATE_LBL[s[k]];
+    el.className = 'drop-state ' + STATE_CLS[s[k]];
+  });
+
+  const sc = calcScore(s);
+  const tier = getSigType(sc);
+  const sig = SIG_MAP[tier];
+
+  // Result panel class
+  const rp = document.getElementById('result-panel');
+  rp.className = 'result-panel ' + tier;
+
+  // Signal
+  document.getElementById('res-signal').textContent = sig.label;
+  document.getElementById('res-signal').style.color = sig.color;
+
+  // Badge
+  const bd = document.getElementById('res-badge');
+  bd.textContent = sig.badge;
+  bd.style.color = sig.color;
+  bd.style.borderColor = sig.color + '44';
+  bd.style.background = sig.color + '18';
+
+  // Score ring
+  const circ = 2 * Math.PI * 32;
+  const offset = circ - (sc / 100) * circ;
+  const arc = document.getElementById('score-arc');
+  arc.setAttribute('stroke-dashoffset', offset.toFixed(1));
+  arc.setAttribute('stroke', sig.color);
+  const sn = document.getElementById('score-num');
+  sn.textContent = sc;
+  sn.style.color = sig.color;
+
+  // Description
+  document.getElementById('res-desc').innerHTML = getDesc(sc, s);
+
+  // Breakdown
+  ['foreign','retail','institusi','zombie'].map((k,i) => {
+    const id = ['bk-f','bk-r','bk-i','bk-z'][i];
+    const el = document.getElementById(id);
+    el.textContent = BK_W[k][s[k]];
+    el.style.color = BK_C[k][s[k]];
+  });
+
+  // Actions
+  const rec = getRec(sc, s);
+  document.getElementById('ac-entry').textContent   = rec.entry;
+  document.getElementById('ac-risk').textContent    = rec.risk;
+  document.getElementById('ac-monitor').textContent = rec.monitor;
+  document.getElementById('ac-time').textContent    = rec.time;
+
+  // Ref table highlight
+  renderRefTable(s);
+}
+
+function renderRefTable(s) {
+  const P = { sbull:'p-sb', mbull:'p-mb', wait:'p-wt', dist:'p-dt' };
+  const L = { sbull:'STRONG BULL', mbull:'MODERATE BULL', wait:'WAIT & SEE', dist:'STRONG DISTRIBUSI' };
+  const IC = v => v==='in' ? '<span class="ti ti-in">▲IN</span>' : v==='out' ? '<span class="ti ti-out">▼OUT</span>' : '<span class="ti ti-neu">—NEU</span>';
+  const isCur = sc => sc.f===s.foreign && sc.r===s.retail && sc.i===s.institusi && sc.z===s.zombie;
+
+  document.getElementById('ref-tbody').innerHTML = SCENARIOS.map((sc, idx) => `
+    <tr class="${isCur(sc)?'cur-row':''}">
+      <td style="font-family:monospace;font-size:10px;color:#7A7060">${isCur(sc)?'▶':String(idx+1).padStart(2,'0')}</td>
+      <td>${IC(sc.f)}</td><td>${IC(sc.r)}</td><td>${IC(sc.i)}</td><td>${IC(sc.z)}</td>
+      <td><span class="pill ${P[sc.tp]}">${L[sc.tp]}</span></td>
+      <td>${sc.note}</td>
+    </tr>
+  `).join('');
+}
+
+function toggleRef() {
+  const wrap = document.getElementById('ref-table');
+  const btn  = document.getElementById('ref-toggle');
+  const arrow = document.getElementById('toggle-arrow');
+  wrap.classList.toggle('open');
+  btn.classList.toggle('open');
+  arrow.textContent = wrap.classList.contains('open') ? '▴' : '▾';
+  if (wrap.classList.contains('open')) renderRefTable({
+    foreign: document.getElementById('sel-foreign').value,
+    retail:  document.getElementById('sel-retail').value,
+    institusi: document.getElementById('sel-institusi').value,
+    zombie:  document.getElementById('sel-zombie').value,
+  });
+}
+
+window.update = update;
+window.toggleRef = toggleRef;
+update();
 </script>
 </body>
 </html>
